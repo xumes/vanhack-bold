@@ -2,22 +2,10 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-import axios from 'axios'
+import Dashboard from './Dashboard';
 
 class App extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      reviews: {}
-    }
-
-    axios
-      .get('/db/get/reviews')
-      .then(reviews => {
-        console.log("all reviews", reviews)
-      })
-  }
+  
   render() {
     return (
       <div className="App">
@@ -25,9 +13,9 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Vanhack :: Bold - Hackathon</h1>
         </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        <div className="App-intro">
+          <Dashboard />
+        </div>
       </div>
     );
   }
