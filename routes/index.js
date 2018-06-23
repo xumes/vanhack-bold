@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const moment = require('moment');
+const _ = require('lodash')
 
 const Reviews = require('../services/reviews')
 const Shopify = require('../services/shopify')
@@ -21,30 +22,34 @@ const init = connection => {
         const appSlug = req.query.app
         Shopify.getReviews(appSlug)
             .then(data => {
+                console.log("**********************", data.reviews.length)
+                _.forEach(data.reviews, item => {
+                    console.log(item);
 
-                //check if this review is already on the database
-                Reviews.getOneReview(
-                    storeData(data.reviews[0], appSlug)
-                )
-                    .then(review => {
-                        if (review.length > 0) {
-                            // save the reviews on the database
-                            Reviews.updateReview(
-                                updateData(data.reviews[0], review[0], appSlug)
-                            )
-                                .then(status => res.send(data))
-                                .catch(err => res.send(err))
-                        } else {
-                            console.log("there is no previous review for that")
-                            Reviews.saveReviews(
-                                storeData(data.reviews[0], appSlug)
-                            )
-                                .then(status => res.send(data))
-                                .catch(err => res.send(err))
-                        }
-                    })
-            })
-            .catch(err => console.log('error', err))
+                    //check if this review is already on the database
+                    Reviews.getOneReview(
+                        storeData(item, appSlug)
+                    )
+                        .then(review => {
+                            if (review.length > 0) {
+                                // save the reviews on the database
+                                Reviews.updateReview(
+                                    updateData(item, review[0], appSlug)
+                                )
+                                    .then(status => res.send(data))
+                                    .catch(err => res.send(err))
+                            } else {
+                                console.log("there is no previous review for that")
+                                Reviews.saveReviews(
+                                    storeData(item, appSlug)
+                                )
+                                    .then(status => res.send(data))
+                                    .catch(err => res.send(err))
+                            }
+                        })
+                })
+                    .catch(err => console.log('error', err))
+            });
     })
 
     return router;
@@ -68,7 +73,7 @@ const updateData = (data, review, appSlug) => {
         app_slug: appSlug,
         star_rating: data.star_rating,
         previous_star_rating: review.star_rating,
-        updated_at: currentDate 
+        updated_at: currentDate
     }
     return info
 }
