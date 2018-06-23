@@ -6,7 +6,7 @@ const _ = require('lodash')
 const Reviews = require('../services/reviews')
 const Shopify = require('../services/shopify')
 
-const init = connection => {
+const init = () => {
     router.get('/', async (req, res) => {
         res.json({ 'status': 'You are in the API route' })
     });
