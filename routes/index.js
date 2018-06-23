@@ -1,5 +1,6 @@
-const express = require('express')
-const router = express.Router()
+const express = require('express');
+const router = express.Router();
+const moment = require('moment');
 
 const Reviews = require('../services/reviews')
 const Shopify = require('../services/shopify')
@@ -17,19 +18,59 @@ const init = connection => {
 
     router.get('/shopify/get/reviews', (req, res) => {
         //connect to Shopify to get updated reviews
-        Shopify.getReviews(req.query.app)
-            .then(data => res.send(data))
+        const appSlug = req.query.app
+        Shopify.getReviews(appSlug)
+            .then(data => {
+
+                //check if this review is already on the database
+                Reviews.getOneReview(
+                    storeData(data.reviews[0], appSlug)
+                )
+                    .then(review => {
+                        if (review.length > 0) {
+                            // save the reviews on the database
+                            Reviews.updateReview(
+                                updateData(data.reviews[0], review[0], appSlug)
+                            )
+                                .then(status => res.send(data))
+                                .catch(err => res.send(err))
+                        } else {
+                            console.log("there is no previous review for that")
+                            Reviews.saveReviews(
+                                storeData(data.reviews[0], appSlug)
+                            )
+                                .then(status => res.send(data))
+                                .catch(err => res.send(err))
+                        }
+                    })
+            })
             .catch(err => console.log('error', err))
-
-        //connect to database to store the infomation
     })
-
-
-
 
     return router;
 }
 
+const storeData = (data, appSlug) => {
+    const currentDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+    const info = {
+        shopify_domain: data.shop_domain,
+        app_slug: appSlug,
+        star_rating: data.star_rating,
+        created_at: currentDate
+    }
+    return info
+}
 
+const updateData = (data, review, appSlug) => {
+    const currentDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+    const info = {
+        shopify_domain: data.shop_domain,
+        app_slug: appSlug,
+        star_rating: data.star_rating,
+        previous_star_rating: review.star_rating,
+        updated_at: currentDate 
+    }
+    return info
+}
 
 module.exports = init
