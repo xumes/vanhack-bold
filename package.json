@@ -1,0 +1,25 @@
+{
+  "name": "shopify-app-reviews",
+  "version": "1.0.0",
+  "description": "Stores and fetchs reviews from shopify apps",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "shopify",
+    "bold",
+    "vanhack",
+    "challenge",
+    "hackathon"
+  ],
+  "author": "Reginaldo Santos (reginaldosantos.br@gmail.com)",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "mysql2": "^1.5.3"
+  }
+}
